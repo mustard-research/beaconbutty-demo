@@ -72,6 +72,46 @@ Browse to **http://localhost:5000/**. Override the port with `PORT=8080 python3 
 
 ---
 
+## Run on Windows (WSL)
+
+The demo is pure Python + Flask — no hardware dependencies — so it runs fine on any WSL2 distro (Ubuntu, Debian, etc.).
+
+**Quickest path — no systemd, no sudo dance:**
+
+```sh
+sudo apt update && sudo apt install -y python3-flask git
+git clone https://github.com/mustard-research/beaconbutty-demo
+cd beaconbutty-demo
+python3 app.py
+```
+
+Open **http://localhost:5000/** in your Windows browser — WSL2 auto-forwards `localhost` from the WSL distro to Windows, no extra config.
+
+**If you want the systemd install path** (so the demo auto-starts each `wsl` boot), make sure systemd is enabled — default on Windows 11 22H2+ for Ubuntu/Debian, but easy to check:
+
+```sh
+systemctl is-system-running   # "running" or "degraded" = systemd is on
+```
+
+If it says `offline` (or the command is missing), enable systemd once:
+
+```sh
+sudo tee /etc/wsl.conf > /dev/null <<'EOF'
+[boot]
+systemd=true
+EOF
+```
+
+…then from Windows PowerShell run `wsl --shutdown` and reopen your WSL terminal. After that `sudo bash bootstrap.sh` (or the manual `install.sh`) works exactly as it does on a Pi.
+
+**Things to know about WSL networking:**
+
+- `http://localhost:5000/` from your Windows browser **works** out of the box.
+- `http://<your-PC-LAN-IP>:5000/` from another device on your LAN **does not** — WSL2 lives on a private NAT subnet that other LAN devices can't reach without Windows-side port forwarding. For a "show on a projector" demo, run it on the actual Pi instead.
+- Port 5000 in use already? `PORT=8080 python3 app.py` (manual run) or edit `Environment=PORT=` in `systemd/beaconbutty-demo.service` before installing.
+
+---
+
 ## What's demonstrated
 
 | Page | Shows |
